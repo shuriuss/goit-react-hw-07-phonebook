@@ -2,42 +2,44 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import s from './ContactList.module.css';
 
-import { getContacts, getFilter } from 'redux/selectors';
 import { useDispatch } from 'react-redux';
-import { deleteContact } from '../../redux/contactSlice';
 import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { deleteContact, fetchContacts } from 'redux/operations';
+import { getContacts } from 'redux/selectors';
 
 function ContactList() {
-  const contacts = useSelector(getContacts);
-  const filter = useSelector(getFilter)
-  // const newConntact = Array.from(contacts)
+  
   const dispatch = useDispatch();
-  const currentContacts = contacts.filter(contact => contact.name.toLowerCase().includes(filter));
-
+  // Получаем части состояния
+  const { contacts, isLoading, error } = useSelector(getContacts);
   console.log(contacts);
-  
+  // Вызываем операцию
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
-
-
-
-  const handleDelete = (id) =>  dispatch(deleteContact(id));
-  
+  // Удаление контакта
+  const handleDelete = id => {
+    return dispatch(deleteContact(id));}
 
   return (
     <>
-      {currentContacts.length === 0 ? (
+      {isLoading && <b>Loading tasks...</b>}
+      {error && <b>{error}</b>}
+      {contacts.length === 0 ? (
         <p>No contact</p>
       ) : (
         <>
           <ul className={s.contact__list}>
-            {currentContacts.map(({ id, name, number }) => (
+            {contacts.map(({ id, name, phone }) => (
               <li key={id} className={s.contact__item}>
                 <p>
-                  {name}: {number}
+                  {name}: {phone}
                 </p>
                 <button
                   type="button"
-                  onClick={() => handleDelete(id)}
+                  onClick={()=>handleDelete(id)}
                   className={s.contact__button}
                 >
                   Delete
@@ -50,15 +52,62 @@ function ContactList() {
     </>
   );
 }
-ContactList.propTypes = {
-  handleDelete: PropTypes.func,
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    }).isRequired
-  ),
-};
 
 export default ContactList;
+
+// function ContactList() {
+//   const contacts = useSelector(getContacts);
+//   const filter = useSelector(getFilter);
+//   const dispatch = useDispatch();
+//   const currentContacts = contacts.filter(contact =>
+//     contact.name.toLowerCase().includes(filter)
+//   );
+
+//    // Получаем части состояния
+//    const { items, isLoading, error } = useSelector(getContact);
+//    // Вызываем операцию
+//    useEffect(() => {
+//      dispatch(fetchTasks());
+//    }, [dispatch]);
+
+//   const handleDelete = id => dispatch(deleteContact(id));
+
+//   return (
+//     <>
+//       {currentContacts.length === 0 ? (
+//         <p>No contact</p>
+//       ) : (
+//         <>
+//           <ul className={s.contact__list}>
+//             {currentContacts.map(({ id, name, number }) => (
+//               <li key={id} className={s.contact__item}>
+//                 <p>
+//                   {name}: {number}
+//                 </p>
+//                 <button
+//                   type="button"
+//                   onClick={() => handleDelete(id)}
+//                   className={s.contact__button}
+//                 >
+//                   Delete
+//                 </button>
+//               </li>
+//             ))}
+//           </ul>
+//         </>
+//       )}
+//     </>
+//   );
+// }
+// ContactList.propTypes = {
+//   handleDelete: PropTypes.func,
+//   contacts: PropTypes.arrayOf(
+//     PropTypes.shape({
+//       id: PropTypes.number.isRequired,
+//       name: PropTypes.string.isRequired,
+//       number: PropTypes.string.isRequired,
+//     }).isRequired
+//   ),
+// };
+
+// export default ContactList;

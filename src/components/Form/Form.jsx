@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import s from './Form.module.css';
 
-import { addContact } from '../../redux/contactSlice';
+import { contactReducer } from '../../redux/contactSlice';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { getContacts } from 'redux/selectors';
+import { addContact } from 'redux/operations';
 
 function Form() {
   const contacts = useSelector(getContacts);
@@ -33,23 +34,27 @@ function Form() {
   };
 
   const handleSubmit = e => {
+    console.log(contacts);
     e.preventDefault();
     const name = e.target.elements.name.value;
-    const number = e.target.elements.number.value;
+    const phone = e.target.elements.number.value;
+    const newContact = { name, phone };
 
     if (name.length === 0) {
       return;
     }
-    if (number.length === 0) {
+    if (phone.length === 0) {
       return;
     }
 
-    if (contacts.some(el => el.name === name)) {
+    if (contacts?.length > 0 && contacts.some(el => el.name === name)) {
       alert(` ${name} is already in contacts`);
       return;
     }
 
-    dispatch(addContact(name, number));
+    dispatch(addContact(newContact));
+    setName('');
+    setNumber('');
   };
 
   return (
