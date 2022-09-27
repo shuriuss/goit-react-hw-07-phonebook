@@ -7,7 +7,7 @@ import { getContacts } from 'redux/selectors';
 import { addContact } from 'redux/operations';
 
 function Form() {
-  const contacts = useSelector(getContacts);
+  const {contacts} = useSelector(getContacts);
 
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
@@ -33,11 +33,11 @@ function Form() {
   };
 
   const handleSubmit = e => {
-    console.log(contacts);
     e.preventDefault();
     const name = e.target.elements.name.value;
     const phone = e.target.elements.number.value;
     const newContact = { name, phone };
+    
 
     if (name.length === 0) {
       return;
@@ -46,7 +46,9 @@ function Form() {
       return;
     }
 
-    if (contacts?.length > 0 && contacts.some(el => el.name === name)) {
+    const inputContact =  contacts.some(el => el.name === name);
+    
+    if (inputContact) {
       alert(` ${name} is already in contacts`);
       return;
     }

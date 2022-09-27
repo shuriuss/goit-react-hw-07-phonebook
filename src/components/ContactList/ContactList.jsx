@@ -7,6 +7,9 @@ import { useEffect } from 'react';
 import { deleteContact, fetchContacts } from 'redux/operations';
 import { getContacts, getFilter } from 'redux/selectors';
 
+import { RotatingLines } from  'react-loader-spinner'
+
+
 function ContactList() {
   const dispatch = useDispatch();
   // Получаем части состояния
@@ -21,15 +24,15 @@ function ContactList() {
   };
   // фильтрация по имени
   const filter = useSelector(getFilter);
-  console.log(filter);
+  
   const currentContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(filter)
   );
-  console.log(currentContacts);
-
+  
   return (
     <>
-      {isLoading && <b>Loading tasks...</b>}
+  
+      {isLoading && <RotatingLines/>}
       {error && <b>{error}</b>}
       {currentContacts.length === 0 ? (
         <p>No contact</p>
