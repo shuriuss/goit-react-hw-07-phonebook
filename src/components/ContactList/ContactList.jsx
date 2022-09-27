@@ -2,44 +2,48 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import s from './ContactList.module.css';
 
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { deleteContact, fetchContacts } from 'redux/operations';
-import { getContacts } from 'redux/selectors';
+import { getContacts, getFilter } from 'redux/selectors';
 
 function ContactList() {
-  
   const dispatch = useDispatch();
   // Получаем части состояния
   const { contacts, isLoading, error } = useSelector(getContacts);
-  console.log(contacts);
   // Вызываем операцию
   useEffect(() => {
     dispatch(fetchContacts());
   }, [dispatch]);
-
   // Удаление контакта
   const handleDelete = id => {
-    return dispatch(deleteContact(id));}
+    return dispatch(deleteContact(id));
+  };
+  // фильтрация по имени
+  const filter = useSelector(getFilter);
+  console.log(filter);
+  const currentContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter)
+  );
+  console.log(currentContacts);
 
   return (
     <>
       {isLoading && <b>Loading tasks...</b>}
       {error && <b>{error}</b>}
-      {contacts.length === 0 ? (
+      {currentContacts.length === 0 ? (
         <p>No contact</p>
       ) : (
         <>
           <ul className={s.contact__list}>
-            {contacts.map(({ id, name, phone }) => (
+            {currentContacts.map(({ id, name, phone }) => (
               <li key={id} className={s.contact__item}>
                 <p>
                   {name}: {phone}
                 </p>
                 <button
                   type="button"
-                  onClick={()=>handleDelete(id)}
+                  onClick={() => handleDelete(id)}
                   className={s.contact__button}
                 >
                   Delete
@@ -52,6 +56,20 @@ function ContactList() {
     </>
   );
 }
+
+ContactList.propTypes = {
+    handleDelete: PropTypes.func,
+    contacts: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired,
+        number: PropTypes.string.isRequired,
+      }).isRequired
+    ),
+  };
+
+
+
 
 export default ContactList;
 
